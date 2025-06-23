@@ -11,17 +11,7 @@ union clause ast = VENUS_MSB : bits(32)
 /* Venus 辅助函数：地址与掩码计算                               */
 /* ************************************************************ */
 
-/* 临时读取 DSPM 的辅助函数（仅返回魔法数位置） */
-function venus_dspm_load(row:int, lane:int) -> bits(32) = {
-  assert(row < venus_dspm_row, "DSPM row index is out of bounds!");
-  assert(lane < venus_dspm_lane, "DSPM lane index is out of bounds!");
-
-  let row_bits_idx  = to_bits_truncate(8, row);
-  let lane_bits_idx = to_bits_truncate(4, lane);
-
-  let row_vec = vector_access(VENUS_DSPM, unsigned(row_bits_idx));
-  vector_access(row_vec, unsigned(lane_bits_idx))
-}
+/* 已移除 venus_dspm_load，后续直接访问 VENUS_DSPM */
 
 function get_abs_addr_and_mask(
   idx: int,
@@ -90,11 +80,12 @@ function execute_venus(venus_inst : bits(64)) -> unit = {
         assert(row < venus_dspm_row, "DSPM row index is out of bounds!");
         assert(lane < venus_dspm_lane, "DSPM lane index is out of bounds!");
 
-        /* 直接从 DSPM 读取（暂仅支持 row=0,lane=0，以确保类型检查通过） */
-        let dspm_val : bits(32) = venus_dspm_load(row, lane);
+        /* 直接访问 VENUS_DSPM */
+        let row_bits_idx  = to_bits_truncate(8, row);
+        let lane_bits_idx = to_bits_truncate(4, lane);
+        let dspm_val : bits(32) = vector_access(vector_access(VENUS_DSPM, unsigned(row_bits_idx)), unsigned(lane_bits_idx));
 
-        print_bits("[Venus] VLOAD dspm_val = ", dspm_val);
-        result = zero_extend(xlen, dspm_val);
+        result = result + zero_extend(xlen, dspm_val);
       };
 
       /* 写回 rd */
