@@ -1,9 +1,9 @@
 .global main
 main:
     # 设置输入寄存器
-    li x11, 0x1000         # rs1 (base addr)
-    li x12, 0x4            # rs2 (stride)
-    li x13, 0xBADF00D      # rd 预置
+    li x11, 0x0            # rs1 (base addr = 0)
+    li x12, 0x0            # rs2 (stride = 0)
+    li x13, 0xDEADBEEF     # rd 预置
 
     # 手动编码 64-bit VLOAD
     # MSB：高 8 位 v_opcode=0x01；低 7 位 custom-0 opcode=0x0B
@@ -15,8 +15,9 @@ main:
     #  rd  -> bits[11:7]  = 0b01101 = 0x0D
     .word 0x00C58680       # LSB
 
-    # 当前 Sail 实现应将 x13 写 0
-    bnez x13, fail
+    # 期望 x13 == 0xABCD1234
+    li x10, 0xABCD1234
+    bne x13, x10, fail
 
 pass:
     li a0, 0

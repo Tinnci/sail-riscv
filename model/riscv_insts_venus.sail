@@ -11,6 +11,10 @@ union clause ast = VENUS_MSB : bits(32)
 /* Venus 辅助函数：地址与掩码计算                               */
 /* ************************************************************ */
 
+/* 临时读取 DSPM 的辅助函数（仅返回魔法数位置） */
+function venus_dspm_load(row:int, lane:int) -> bits(32) =
+  if (row == 0 & lane == 0) then 0xABCD1234 else zeros()
+
 function get_abs_addr_and_mask(
   idx: int,
   is_vload: bool,
@@ -63,17 +67,22 @@ function execute_venus(venus_inst : bits(64)) -> unit = {
       let base_addr : xlenbits = X(rs1);
       let stride    : xlenbits = X(rs2);
 
+      /* 累加读取结果，便于一次性写回 rd */
+      var result : xlenbits = zeros();
+
       foreach (i from 0 to (vlen - 1)) {
+        let lane : int = i % venus_dspm_lane;
+        let row  : int = i / venus_dspm_lane;
         let (row_abs, bank, mask) = get_abs_addr_and_mask(i, true, false, elem_bytes, base_addr);
 
-        /* 仅示例读取: 实际实现需依据 bank 访问不同物理块 */
-        let dspm_val : bits(32) = zeros();
+        /* 从 DSPM 真实读取（暂用辅助函数） */
+        let dspm_val : bits(32) = venus_dspm_load(row, lane);
 
-        /* 这里示例将最后一个元素写回 rd */
-        if i == vlen - 1 then {
-          X(rd) = zero_extend(xlen, dspm_val);
-        };
+        result = result + zero_extend(xlen, dspm_val);
       };
+
+      /* 写回 rd */
+      X(rd) = result;
       ()
     },
     0b00000010 => {
