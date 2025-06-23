@@ -15,4 +15,11 @@ val ext_decode_compressed : bits(16) -> ast
 function ext_decode_compressed(bv) = encdec_compressed(bv)
 
 val ext_decode : bits(32) -> ast
-function ext_decode(bv) = encdec(bv)
+function ext_decode(bv) = {
+  if bv[6 .. 0] == 0b0001011 then {
+    /* custom-0 opcode recognised as Venus MSB */
+    VENUS_MSB(bv)
+  } else {
+    encdec(bv)
+  }
+}

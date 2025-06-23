@@ -92,6 +92,7 @@ foreach (xlen IN ITEMS 32 64)
                 "riscv_insts_zvkned.sail"
                 "riscv_insts_zvknhab.sail"
                 "riscv_insts_zvksh.sail"
+                "riscv_insts_venus.sail"
                 # Zimop and Zcmop should be at the end so they can be overridden by earlier extensions
                 "riscv_insts_zimop.sail"
                 "riscv_insts_zcmop.sail"
@@ -169,6 +170,7 @@ foreach (xlen IN ITEMS 32 64)
                 ${sail_check_srcs}
                 "riscv_vreg_type.sail"
                 "riscv_vext_regs.sail"
+                "riscv_venus_state.sail"
             )
 
             set(sail_arch_srcs
