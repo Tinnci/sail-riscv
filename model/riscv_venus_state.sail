@@ -31,8 +31,12 @@ let  venus_mask_size           = sizeof(venus_mask_size)
 function init_venus_dspm() -> vector(venus_dspm_row, vector(venus_dspm_lane, bits(32))) = {
   /* 全零初始化 */
   var v : vector(venus_dspm_row, vector(venus_dspm_lane, bits(32))) = vector_init(vector_init(zeros()));
-  /* 在 (row=0, lane=0) 位置写入魔法数 */
+  /* VLOAD/VSTORE 测试的魔法数 */
   v[0][0] = 0xABCD1234;
+
+  /* VADD 测试操作数 (row=1, lane0/1) */
+  v[1][0] = 0x00000064;  /* 100 */
+  v[1][1] = 0x000000C8;  /* 200 */
   v
 }
 

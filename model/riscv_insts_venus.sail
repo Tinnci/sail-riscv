@@ -136,6 +136,23 @@ function execute_venus(venus_inst : bits(64)) -> unit = {
       };
       ()
     },
+    0b00000011 => {
+      print_bits("[Venus] VADD inst bits = ", venus_inst);
+
+      /* 读取测试用预置数据：row 1 的 lane 0 与 lane 1 */
+      let row_bits_idx : bits(8)  = 0b00000001; /* row 1 */
+      let row_vec      : vector(venus_dspm_lane, bits(32)) = vector_access(VENUS_DSPM, unsigned(row_bits_idx));
+
+      let op1 : bits(32) = vector_access(row_vec, 0);
+      let op2 : bits(32) = vector_access(row_vec, 1);
+
+      let sum32 : bits(32) = op1 + op2; /* wrap-around 加法即可 */
+      let sumXL : xlenbits = zero_extend(xlen, sum32);
+
+      /* 写回 rd 寄存器 */
+      X(rd) = sumXL;
+      ()
+    },
     _ => {
       print_bits("[Venus] Unknown opcode = ", v_opcode);
       handle_illegal(venus_inst[31 .. 0]);
