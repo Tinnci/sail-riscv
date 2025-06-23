@@ -115,11 +115,17 @@ function clause execute VENUS_MSB(msb_inst) = {
           /* 调用核心执行逻辑 */
           execute_venus(venus_inst);
 
-          /* 更新 PC：跳过两条 32-bit 指令 */
-          PC = PC + 8;
+          /* 更新 PC：跳过两条 32-bit 指令（覆盖 run_hart_active 预设的 +4） */
+          set_next_pc(PC + 8);
           RETIRE_SUCCESS
         }
       }
     }
   }
-} 
+}
+
+/* ************************************************************ */
+/* ASM 打印支持：简单十六进制输出                                   */
+/* ************************************************************ */
+
+mapping clause assembly = VENUS_MSB(bits) <-> "venus.msb" ^ spc() ^ hex_bits_32(bits) 

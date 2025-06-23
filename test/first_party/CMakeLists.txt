@@ -1,4 +1,3 @@
-
 # First party tests
 
 # There are three options for cross-compilation of an RV32 program.
@@ -86,6 +85,7 @@ set(tests
     "test_max_pmp.c"
     "test_minstret.S"
     "test_pmp_access.c"
+    "test_venus_vload.S"
 )
 
 foreach (xlen IN ITEMS 32 64)
