@@ -86,6 +86,7 @@ set(tests
     "test_minstret.S"
     "test_pmp_access.c"
     "test_venus_vload.S"
+    "test_vstore.S"
 )
 
 foreach (xlen IN ITEMS 32 64)
